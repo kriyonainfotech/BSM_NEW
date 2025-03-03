@@ -59,7 +59,7 @@ const createPurchaseBill = async (req, res) => {
         throw new Error("Invalid product details in items array.");
       }
 
-      if (saleRate > mrp) {
+      if (saleRate >= mrp) {
         return res.status(400).json({
           success: false,
           message: "SaleRate કરતાં MRP વધુ હોઈ શકતી નથી..",
