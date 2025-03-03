@@ -406,6 +406,8 @@ const updatePurchaseBill = async (req, res) => {
       (sum, item) => sum + item.totalAmount,
       0
     );
+    console.log(`🔢 Recalculated Grand Total: ${existingBill.grandTotal}`);
+
     existingBill.accountId = accountId;
     await existingBill.save();
 
