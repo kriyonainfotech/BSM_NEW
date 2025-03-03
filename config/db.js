@@ -8,7 +8,7 @@ const ConnectDb = async () => {
       {
         useNewUrlParser: true,
         useUnifiedTopology: true,
-        serverSelectionTimeoutMS: 60000, // 60 seconds (MongoDB server selection timeout)
+        serverSelectionTimeoutMS: 20000, // 60 seconds (MongoDB server selection timeout)
         socketTimeoutMS: 60000, // 60 seconds (Keep socket connection alive)
         maxPoolSize: 10, // Limits concurrent connections (adjust as needed)
       }
