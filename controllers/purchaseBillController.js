@@ -313,7 +313,12 @@ const updatePurchaseBill = async (req, res) => {
         (i) => i.productId.toString() === productId
       );
       const previousQuantity = existingItem ? existingItem.quantity : 0;
-      const quantityDifference = quantity - previousQuantity;
+      const quantityDifference = existingItem ? quantity - previousQuantity : quantity;
+
+      console.log(
+      `📌 Product ${productId} | Previous: ${previousQuantity}, Requested: ${quantity}, Difference: ${quantityDifference}`
+      );
+
 
       if (stockEntry) {
         console.log(
