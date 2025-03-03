@@ -6,7 +6,7 @@ const SaleBill = require("../models/SaleBill");
 
 const createPurchaseBill = async (req, res) => {
   try {
-    console.log("🟢 [START] Processing purchase bill...");
+    console.log("🟢 [START] Processing purchase bill...-----");
 
     const { accountId, items, userId } = req.body;
 
