@@ -6,7 +6,7 @@ const SaleBill = require("../models/SaleBill");
 
 const createPurchaseBill = async (req, res) => {
   try {
-    console.log("🟢 [START] Processing purchase bill...-----");
+    console.log("🟢 [START] Processing purchase bill...");
 
     const { accountId, items, userId } = req.body;
 
@@ -16,7 +16,7 @@ const createPurchaseBill = async (req, res) => {
       );
       return res.status(400).json({
         success: false,
-        message: "Invalid input data provided or empty items list.",
+        message: "Invalid input data or empty items list.",
       });
     }
 
@@ -44,25 +44,30 @@ const createPurchaseBill = async (req, res) => {
       billNo,
     });
     await newBill.save();
-    console.log("✅ Purchase bill created:", newBill);
-    console.log("✅ Purchase bill  id :", newBill._id);
+    console.log(`✅ Purchase bill created with ID: ${newBill._id}`);
 
-    // Process all stock updates concurrently using Promise.all()
     console.log(`🔄 Updating stock for ${items.length} items...`);
-    const stockUpdates = items.map(async (item, index) => {
-      const { productId, quantity, purchaseRate, mrp, saleRate } = item;
+
+    for (let index = 0; index < items.length; index++) {
+      const { productId, quantity, purchaseRate, mrp, saleRate } = items[index];
 
       if (!productId || !quantity || !purchaseRate) {
-        console.error(
+        console.log(
           `❌ [ITEM ERROR] Invalid product details at index ${index}.`
         );
-        throw new Error("Invalid product details in items array.");
-      }
-
-      if (saleRate >= mrp) {
         return res.status(400).json({
           success: false,
-          message: "SaleRate કરતાં MRP વધુ હોઈ શકતી નથી..",
+          message: `Invalid product details at index ${index}.`,
+        });
+      }
+
+      if (mrp < saleRate) {
+        console.log(
+          `❌ [PRICE ERROR] Sale rate cannot exceed MRP at index ${index}.`
+        );
+        return res.status(400).json({
+          success: false,
+          message: "Sale rate MRP કરતાં વધુ હોઈ શકતી નથી..",
         });
       }
 
@@ -81,6 +86,7 @@ const createPurchaseBill = async (req, res) => {
       console.log(
         `📦 Processing stock for product ${productId} (Qty: ${quantity})...`
       );
+
       let existingStock = await ProductStock.findOne({ userId, productId });
 
       if (existingStock) {
@@ -106,10 +112,10 @@ const createPurchaseBill = async (req, res) => {
 
         existingStock.totalStock += quantity;
         existingStock.stocks.sort((a, b) => a.purchaseRate - b.purchaseRate);
-        return existingStock.save(); // Return the promise for concurrent execution
+        await existingStock.save();
       } else {
         console.log(`🆕 Creating new stock record for product ${productId}...`);
-        return ProductStock.create({
+        await ProductStock.create({
           productId,
           userId,
           stocks: [
@@ -118,29 +124,29 @@ const createPurchaseBill = async (req, res) => {
           totalStock: quantity,
         });
       }
-    });
+    }
 
-    // Execute all stock updates in parallel
-    await Promise.all(stockUpdates);
     console.log("✅ Stock updates completed.");
 
     // Update bill with formatted items and total amount
     newBill.items = formattedItems;
     newBill.grandTotal = grandTotal;
     await newBill.save();
-    console.log("💰 Final bill updated with grand total:", grandTotal);
+    console.log(`💰 Final bill updated with grand total: ₹${grandTotal}`);
 
     console.log("🟢 [SUCCESS] Purchase bill created successfully.");
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: "Purchase bill created successfully.",
       bill: newBill,
     });
   } catch (error) {
-    console.error("❌ [ERROR] Failed to create purchase bill:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Server error", error: error.message });
+    console.log("❌ [ERROR] Failed to create purchase bill:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
 
@@ -193,7 +199,7 @@ const getPurchaseBillById = async (req, res) => {
 
     return res.status(200).json({ success: true, bill });
   } catch (error) {
-    console.error(error);
+    console.log(error);
     res.status(500).json({ success: false, message: "Server error", error });
   }
 };
@@ -469,7 +475,7 @@ const updatePurchaseBill = async (req, res) => {
       purchaseBill: existingBill,
     });
   } catch (error) {
-    console.error(`❌ Error updating purchase bill:`, error);
+    console.log(`❌ Error updating purchase bill:`, error);
     res.status(500).json({ success: false, message: "⚠️ Server error", error });
   }
 };
@@ -536,7 +542,7 @@ const createInvoiceBill = async (saleBillId, kasar, billNo) => {
 
     await newInvoiceBill.save();
   } catch (error) {
-    console.error("Error in creating invoice bill:", error);
+    console.log("Error in creating invoice bill:", error);
     throw new Error("Error generating invoice bill.");
   }
 };
@@ -610,7 +616,7 @@ const deletePurchaseBill = async (req, res) => {
       bill: deletedBill,
     });
   } catch (error) {
-    console.error(error);
+    console.log(error);
     res.status(500).json({ success: false, message: "Server error", error });
   }
 };
@@ -620,7 +626,7 @@ const getAllPurchaseBills = async (req, res) => {
     const bills = await PurchaseBill.find();
     return res.status(200).json({ success: true, bills });
   } catch (error) {
-    console.error(error);
+    console.log(error);
     res.status(500).send({ success: false, message: "Server error", error });
   }
 };
