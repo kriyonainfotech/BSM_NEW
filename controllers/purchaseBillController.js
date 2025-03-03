@@ -280,6 +280,8 @@ const updatePurchaseBill = async (req, res) => {
     for (const item of items) {
       const { productId, quantity, purchaseRate, oldMrp, newMrp, saleRate } =
         item;
+
+      console.log('All details of product(to update)',productId, quantity, purchaseRate, oldMrp, newMrp, saleRate);
       const finalMrp = newMrp || oldMrp;
 
       if (saleRate > finalMrp) {
