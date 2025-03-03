@@ -20,6 +20,13 @@ const createPurchaseBill = async (req, res) => {
       });
     }
 
+    if (mrp > saleRate) {
+      return res.status(400).json({
+        success: false,
+        message: "MRP વેચાણ દર કરતાં વધુ હોઈ શકતી નથી.",
+      });
+    }
+
     let grandTotal = 0;
     const formattedItems = [];
 
@@ -614,7 +621,7 @@ const getAllPurchaseBills = async (req, res) => {
     return res.status(200).json({ success: true, bills });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: "Server error", error });
+    res.status(500).send({ success: false, message: "Server error", error });
   }
 };
 
