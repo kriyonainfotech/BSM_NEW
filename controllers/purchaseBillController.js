@@ -359,6 +359,10 @@ const updatePurchaseBill = async (req, res) => {
         });
       }
 
+      console.log(
+        `📊 pela no stock for ${productId}: ${productStock.totalStock}`
+      );
+
       productStock.totalStock += quantityDifference;
       await productStock.save();
 
