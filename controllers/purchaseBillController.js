@@ -4,7 +4,7 @@ const ProductStock = require("../models/productStock");
 const Counter = require("../models/counter");
 const SaleBill = require("../models/SaleBill");
 
-const createPurchaseBill = async (req, res) => { h
+const createPurchaseBill = async (req, res) => {
   try {
     console.log("🟢 [START] Processing purchase bill...");
 
@@ -198,7 +198,7 @@ const updatePurchaseBill = async (req, res) => {
     if (!purchaseId || !accountId || !items || items.length === 0) {
       return res.status(400).json({
         success: false,
-        message: "❌ જરૂરી ફીલ્ડ ગુમ છે: purchaseId, accountId, items."
+        message: "❌ જરૂરી ફીલ્ડ ગુમ છે: purchaseId, accountId, items.",
       });
     }
 
@@ -208,7 +208,7 @@ const updatePurchaseBill = async (req, res) => {
       console.log(`⚠️ Purchase bill not found: ${purchaseId}`);
       return res
         .status(404)
-        .json({ "success": false, "message": "❌ ખરીદી બીલ મળી નથી." } );
+        .json({ success: false, message: "❌ ખરીદી બીલ મળી નથી." });
     }
 
     if (existingBill.userId.toString() !== userId) {
@@ -225,7 +225,7 @@ const updatePurchaseBill = async (req, res) => {
       deletedProduct.length > 0
     ) {
       for (const productId of deletedProduct) {
-        console.log(`🗑️ Removing product: ${productId,product?.title}`);
+        console.log(`🗑️ Removing product: ${(productId, product?.title)}`);
         const oldItem = existingBill.items.find(
           (item) => item.productId.toString() === productId.toString()
         );
@@ -246,13 +246,21 @@ const updatePurchaseBill = async (req, res) => {
 
             if (stockEntry) {
               console.log(
-                `📉 Reducing stock for ${productId,product?.title}: Existing Qty: ${stockEntry.quantity}, Removing: ${oldItem.quantity}`
+                `📉 Reducing stock for ${
+                  (productId, product?.title)
+                }: Existing Qty: ${stockEntry.quantity}, Removing: ${
+                  oldItem.quantity
+                }`
               );
               stockEntry.quantity -= oldItem.quantity;
               productStock.totalStock -= oldItem.quantity;
 
               if (stockEntry.quantity <= 0) {
-                console.log(`🚫 Removing empty stock entry for ${productId,product?.title}`);
+                console.log(
+                  `🚫 Removing empty stock entry for ${
+                    (productId, product?.title)
+                  }`
+                );
                 productStock.stocks = productStock.stocks.filter(
                   (s) => Math.abs(s.purchaseRate - oldItem.purchaseRate) >= 0.01
                 );
@@ -260,7 +268,9 @@ const updatePurchaseBill = async (req, res) => {
 
               if (productStock.stocks.length === 0) {
                 console.log(
-                  `🗑️ No stocks left for ${productId,product?.title}, deleting record.`
+                  `🗑️ No stocks left for ${
+                    (productId, product?.title)
+                  }, deleting record.`
                 );
                 await ProductStock.deleteOne({ productId, userId });
               } else {
@@ -281,35 +291,46 @@ const updatePurchaseBill = async (req, res) => {
       const { productId, quantity, purchaseRate, oldMrp, newMrp, saleRate } =
         item;
 
-      console.log('All details of product(to update)',productId, quantity, purchaseRate, oldMrp, newMrp, saleRate);
+      console.log(
+        "All details of product(to update)",
+        productId,
+        quantity,
+        purchaseRate,
+        oldMrp,
+        newMrp,
+        saleRate
+      );
       const finalMrp = newMrp || oldMrp;
 
       if (saleRate > finalMrp) {
         return res.status(400).json({
           success: false,
-          message: `⚠️ વેચાણ દર (${saleRate}) MRP (${finalMrp}) કરતા વધુ થઈ શકતો નથી માટે productId: ${productId,product?.title}`
+          message: `⚠️ વેચાણ દર (${saleRate}) MRP (${finalMrp}) કરતા વધુ થઈ શકતો નથી માટે productId: ${
+            (productId, product?.title)
+          }`,
         });
       }
 
-      const product = await Product
-        .findById
-        (productId);
-      if (!product) { 
+      const product = await Product.findById(productId);
+      if (!product) {
         return res.status(404).json({
           success: false,
-          message: `⚠️ ઉત્પાદન મળ્યું નથી: ${productId,product?.title}`
+          message: `⚠️ ઉત્પાદન મળ્યું નથી: ${(productId, product?.title)}`,
         });
       }
 
-
       console.log(
-        `🔄 Updating stock for product ${productId,product?.title,product?.title}: Requested Qty: ${quantity}`
+        `🔄 Updating stock for product ${
+          (productId, product?.title, product?.title)
+        }: Requested Qty: ${quantity}`
       );
 
       let productStock = await ProductStock.findOne({ productId, userId });
       if (!productStock) {
         console.log(
-          `📦 No existing stock found for ${productId,product?.title}, creating new record.`
+          `📦 No existing stock found for ${
+            (productId, product?.title)
+          }, creating new record.`
         );
         productStock = new ProductStock({
           productId,
@@ -326,25 +347,36 @@ const updatePurchaseBill = async (req, res) => {
         (i) => i.productId.toString() === productId
       );
       const previousQuantity = existingItem ? existingItem.quantity : 0;
-      const quantityDifference = existingItem ? quantity - previousQuantity : quantity;
+      const quantityDifference = existingItem
+        ? quantity - previousQuantity
+        : quantity;
 
       console.log(
-      `📌 Product ${productId,product?.title,product?.title} | Previous: ${previousQuantity}, Requested: ${quantity}, Difference: ${quantityDifference}`
+        `📌 Product ${
+          (productId, product?.title, product?.title)
+        } | Previous: ${previousQuantity}, Requested: ${quantity}, Difference: ${quantityDifference}`
       );
-
 
       if (stockEntry) {
         console.log(
-          `🔢 Existing stock found for ${productId,product?.title}: Before Update: ${stockEntry.quantity}, Requested: ${quantity}`
+          `🔢 Existing stock found for ${
+            (productId, product?.title)
+          }: Before Update: ${stockEntry.quantity}, Requested: ${quantity}`
         );
 
         if (stockEntry.quantity + quantityDifference < 0) {
           console.log(
-            `⚠️ Stock for product ${productId,product?.title} cannot go below zero.`
+            `⚠️ Stock for product ${
+              (productId, product?.title)
+            } cannot go below zero.`
           );
           return res.status(400).json({
             success: false,
-            message: `⚠️ ઉત્પાદન ${productId,product?.title} માટે સ્ટોક શૂન્યથી નીચે જઈ શકતું નથી. તમારું વર્તમાન સ્ટોક ${stockEntry.quantity} છે`,
+            message: `⚠️ ઉત્પાદન ${
+              (productId, product?.title)
+            } માટે સ્ટોક શૂન્યથી નીચે જઈ શકતું નથી. તમારું વર્તમાન સ્ટોક ${
+              stockEntry.quantity
+            } છે`,
           });
         }
 
@@ -354,12 +386,16 @@ const updatePurchaseBill = async (req, res) => {
         if (quantity < 0) {
           return res.status(400).json({
             success: false,
-            message: `⚠️ ઉત્પાદન ${productId,product?.title} માટે નકારાત્મક સ્ટોક બનાવી શકાય નહીં.`,
+            message: `⚠️ ઉત્પાદન ${
+              (productId, product?.title)
+            } માટે નકારાત્મક સ્ટોક બનાવી શકાય નહીં.`,
           });
         }
 
         console.log(
-          `➕ Adding new stock entry for ${productId,product?.title} with Qty: ${quantity}`
+          `➕ Adding new stock entry for ${
+            (productId, product?.title)
+          } with Qty: ${quantity}`
         );
         productStock.stocks.push({
           purchaseRate,
@@ -371,14 +407,18 @@ const updatePurchaseBill = async (req, res) => {
       }
 
       console.log(
-        `📊 pela no stock for ${productId,product?.title}: ${productStock.totalStock}`
+        `📊 pela no stock for ${(productId, product?.title)}: ${
+          productStock.totalStock
+        }`
       );
 
       productStock.totalStock += quantityDifference;
       await productStock.save();
 
       console.log(
-        `📊 Final stock for ${productId,product?.title}: ${productStock.totalStock}`
+        `📊 Final stock for ${(productId, product?.title)}: ${
+          productStock.totalStock
+        }`
       );
 
       const totalAmount = purchaseRate * quantity;
@@ -391,7 +431,9 @@ const updatePurchaseBill = async (req, res) => {
         existingItem.saleRate = saleRate;
         existingItem.totalAmount = totalAmount;
       } else {
-        console.log(`➕ Adding new purchase bill entry for ${productId,product?.title}`);
+        console.log(
+          `➕ Adding new purchase bill entry for ${(productId, product?.title)}`
+        );
         console.log(`🔢 TotalAmt: ${totalAmount}`);
         existingBill.items.push({
           productId,
