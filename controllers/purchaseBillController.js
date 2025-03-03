@@ -238,7 +238,8 @@ const updatePurchaseBill = async (req, res) => {
       deletedProduct.length > 0
     ) {
       for (const productId of deletedProduct) {
-        console.log(`🗑️ Removing product: ${(productId, product?.title)}`);
+        console.log(`🗑️ Removing product: ${productId}`);
+
         const oldItem = existingBill.items.find(
           (item) => item.productId.toString() === productId.toString()
         );
