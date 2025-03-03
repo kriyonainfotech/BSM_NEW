@@ -20,13 +20,6 @@ const createPurchaseBill = async (req, res) => {
       });
     }
 
-    if (mrp > saleRate) {
-      return res.status(400).json({
-        success: false,
-        message: "MRP વેચાણ દર કરતાં વધુ હોઈ શકતી નથી.",
-      });
-    }
-
     let grandTotal = 0;
     const formattedItems = [];
 
@@ -64,6 +57,13 @@ const createPurchaseBill = async (req, res) => {
           `❌ [ITEM ERROR] Invalid product details at index ${index}.`
         );
         throw new Error("Invalid product details in items array.");
+      }
+
+      if (mrp > saleRate) {
+        return res.status(400).json({
+          success: false,
+          message: "MRP વેચાણ દર કરતાં વધુ હોઈ શકતી નથી.",
+        });
       }
 
       const totalAmount = purchaseRate * quantity;
