@@ -1,0 +1,13 @@
+const express = require("express");
+const router = express.Router();
+router.use("/auth", require("./authRoutes"));
+router.use("/category", require("./CategoryRoutes"));
+router.use("/company", require("./companyRoutes"));
+router.use("/product", require("./productRoutes"));
+router.use("/account", require("./accoutnRoutes"));
+router.use("/purchasebill", require("./purchaseBillRoutes"));
+router.use("/productstock", require("./productStockRoutes"));
+router.use("/salesman", require("./salesmanRoute"));
+router.use("/salebill", require("./saleBillRoutes"));
+// router.use("/card", require("./imagecardRoutes"));
+module.exports = router;

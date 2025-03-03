@@ -1,0 +1,10 @@
+const express = require('express')
+const { AddCompany,  getCompany, getAllCompanies, updateCompany, deleteCompany, getCompanyByUser } = require('../controllers/companyController')
+const router = express.Router()
+router.post('/AddCompany',AddCompany)
+router.post('/getCompany',getCompany)
+router.get('/getAllCompanies',getAllCompanies)
+router.post('/updateCompany',updateCompany)
+router.delete('/deleteCompany',deleteCompany)
+router.post('/getCompanybyUser',getCompanyByUser)
+module.exports = router
