@@ -382,8 +382,9 @@ const updatePurchaseBill = async (req, res) => {
       );
 
       const totalAmount = purchaseRate * quantity;
+      console.log(`🔢 TotalAmt: ${existingBill.grandTotal}`);
       if (existingItem) {
-        console.log(`🔄 Updating purchase bill entry for ${productId,product?.title}`);
+        console.log(`🔄 Updating purchase bill entry for ${totalAmount}`);
         existingItem.quantity = quantity;
         existingItem.purchaseRate = purchaseRate;
         existingItem.mrp = finalMrp;
@@ -391,6 +392,7 @@ const updatePurchaseBill = async (req, res) => {
         existingItem.totalAmount = totalAmount;
       } else {
         console.log(`➕ Adding new purchase bill entry for ${productId,product?.title}`);
+        console.log(`🔢 TotalAmt: ${totalAmount}`);
         existingBill.items.push({
           productId,
           quantity,
