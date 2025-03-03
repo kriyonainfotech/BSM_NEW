@@ -62,7 +62,7 @@ const createPurchaseBill = async (req, res) => {
       if (saleRate > mrp) {
         return res.status(400).json({
           success: false,
-          message: "વેચાણ દર કરતાં MRP વધુ હોઈ શકતી નથી.",
+          message: "SaleRate કરતાં MRP વધુ હોઈ શકતી નથી..",
         });
       }
 
