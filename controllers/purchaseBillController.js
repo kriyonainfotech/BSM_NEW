@@ -260,21 +260,13 @@ const updatePurchaseBill = async (req, res) => {
 
             if (stockEntry) {
               console.log(
-                `📉 Reducing stock for ${
-                  (productId, product?.title)
-                }: Existing Qty: ${stockEntry.quantity}, Removing: ${
-                  oldItem.quantity
-                }`
+                `📉 Reducing stock for Existing Qty: ${stockEntry.quantity}, Removing: ${oldItem.quantity}`
               );
               stockEntry.quantity -= oldItem.quantity;
               productStock.totalStock -= oldItem.quantity;
 
               if (stockEntry.quantity <= 0) {
-                console.log(
-                  `🚫 Removing empty stock entry for ${
-                    (productId, product?.title)
-                  }`
-                );
+                console.log(`🚫 Removing empty stock entry for ${productId}`);
                 productStock.stocks = productStock.stocks.filter(
                   (s) => Math.abs(s.purchaseRate - oldItem.purchaseRate) >= 0.01
                 );
@@ -282,9 +274,7 @@ const updatePurchaseBill = async (req, res) => {
 
               if (productStock.stocks.length === 0) {
                 console.log(
-                  `🗑️ No stocks left for ${
-                    (productId, product?.title)
-                  }, deleting record.`
+                  `🗑️ No stocks left for ${productId}, deleting record.`
                 );
                 await ProductStock.deleteOne({ productId, userId });
               } else {
